@@ -1,6 +1,10 @@
-# BERT 情感分析模型
+# 情緒分析模型 (BERT)
 
-這是一個基於 BERT 的情感分析模型，可以分析文本的情感傾向（正面/負面）。
+本專案是使用 BERT 模型對 IMDB 電影評論資料集進行情緒分析。模型可以將文本分類為正面或負面情緒。
+
+## 資料集
+
+使用的是 IMDB 電影評論資料集,透過 Hugging Face 的 `datasets` 套件載入。資料集分為訓練集和測試集,我們將其合併後再分割為訓練集、驗證集和測試集,比例約為 8:1:1。
 
 ## 模型下載
 
@@ -10,41 +14,58 @@
 
 下載後，請將模型檔案 `best_BERT.pt` 放在專案根目錄下。
 
-## 環境設置
+## 模型架構
 
-1. 安裝必要套件：
-```bash
-pip install torch transformers datasets pandas numpy tqdm scikit-learn matplotlib
-```
+使用的是 BERT 預訓練模型,在此基礎上添加了分類器層,用於情緒二分類任務。模型的主要組成部分:
 
-2. 下載模型檔案並放置於正確位置。
+- BERT 基礎模型
+- Dropout 層
+- 線性分類層
+
+## 訓練流程
+
+1. 資料預處理:將文本轉換為模型可接受的輸入格式,並創建 PyTorch 資料集和資料載入器
+2. 模型初始化:從預訓練的 BERT 模型初始化我們的分類模型
+3. 訓練迴圈:對模型進行多個 epoch 的訓練,每個 epoch 包括:
+   - 訓練階段:遍歷訓練資料,計算損失並更新模型權重
+   - 驗證階段:在驗證集上評估模型性能
+4. 模型儲存:訓練完成後,儲存最佳模型權重
+5. 繪製學習曲線:將訓練過程中的損失和評估指標繪製成圖表,以觀察模型的學習情況
+
+## 評估指標
+
+使用以下指標評估模型性能:
+
+- 準確率 (Accuracy)
+- F1分數 (F1-score)
+- 召回率 (Recall)
+- 精確率 (Precision)
 
 ## 使用方法
 
-### 單一文本預測
+1. 安裝所需套件:
+   ```
+   pip install -r requirements.txt
+   ```
 
-使用 `predict.py` 進行單一文本的情感分析：
+2. 訓練模型:
+   ```
+   python train_Bert.py
+   ```
+   訓練完成後,模型權重會儲存在 `outputs` 目錄下。
+   
+3. 使用訓練好的模型進行預測:
+   ```
+   python predict.py
+   ```
+   輸入要分析的文本,模型會給出情緒預測結果和信心度。
 
-```bash
-python predict.py
-```
+## 程式架構
 
-程式會進入互動模式，您可以輸入想要分析的文本。輸入 'q' 可以退出程式。
-
-### 批量測試
-
-使用 `test_sentiment.py` 進行批量文本測試：
-
-```bash
-python test_sentiment.py
-```
-
-## 檔案說明
-
-- `train_Bert.py`: 模型訓練主程式
-- `predict.py`: 單一文本預測程式
-- `test_sentiment.py`: 批量測試程式
-- `best_BERT.pt`: 訓練好的模型檔案（需要從 Hugging Face 下載）
+- `train_Bert.py`:模型訓練主程式
+- `predict.py`:使用訓練好的模型進行情緒預測
+- `outputs/`:儲存訓練過程中的模型權重、預測結果、圖表等輸出內容
+- `requirements.txt`:所需的 Python 套件列表
 
 ## 預測結果範例
 
